@@ -22,16 +22,34 @@
 (value-triple (tshell-ensure))
 
 (local
- (progn
-   (defun my-smtlink-expt-config ()
-     (declare (xargs :guard t))
-     (make-smtlink-config :interface-dir "../smtlink/z3_interface"
-                          :SMT-files-dir "z3\_files"
-                          :SMT-module    "RewriteExpt"
-                          :SMT-class     "to_smt_w_expt"
-                          :SMT-cmd       "python"
-                          :file-format   ".py"))
-   (defattach smt-cnf my-smtlink-expt-config)))
+ (defun my-smtlink-expt-config ()
+   (declare (xargs :guard t))
+   (make-smtlink-config :interface-dir "../smtlink/z3_interface"
+                        :SMT-files-dir "z3\_files"
+                        :SMT-module    "RewriteExpt"
+                        :SMT-class     "to_smt_w_expt"
+                        :SMT-cmd       "python"
+                        :file-format   ".py")))
+
+(defun my-smtlink-hint ()
+  (declare (xargs :guard t))
+  (change-smtlink-hint
+   *default-smtlink-hint*
+   :functions (list (make-func :name 'expt
+                               :formals (list (make-decl :name 'r
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'i
+                                                         :type (make-hint-pair :thm 'integerp :hints nil)))
+                               :returns (list (make-decl :name 'ex
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
+                               :body 'nil
+                               :expansion-depth 0
+                               :uninterpreted t))
+   :rm-file nil
+   :smt-hint nil
+   :smt-cnf (my-smtlink-expt-config)))
+
+(defattach smt-hint my-smtlink-hint)
 
 (add-default-hints '((SMT::SMT-hint-wrapper-hint clause)))
 

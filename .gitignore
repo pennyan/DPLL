@@ -2,6 +2,7 @@
 
 tryouts/*
 Carl/*
+z3_files/*
 
 *.cert
 *.port
