@@ -39,7 +39,7 @@
                                :formals (list (make-decl :name 'r
                                                          :type (make-hint-pair :thm 'rationalp :hints nil))
                                               (make-decl :name 'i
-                                                         :type (make-hint-pair :thm 'integerp :hints nil)))
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
                                :returns (list (make-decl :name 'ex
                                                          :type (make-hint-pair :thm 'rationalp :hints nil)))
                                :body 'nil
