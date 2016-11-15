@@ -45,6 +45,7 @@
                                :body 'nil
                                :expansion-depth 0
                                :uninterpreted t))
+   :int-to-rat t
    :rm-file nil
    :smt-hint nil
    :smt-cnf (my-smtlink-expt-config)))
