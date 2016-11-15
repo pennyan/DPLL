@@ -24,7 +24,7 @@
 (local
  (defun my-smtlink-expt-config ()
    (declare (xargs :guard t))
-   (make-smtlink-config :interface-dir "../smtlink/z3_interface"
+   (make-smtlink-config :interface-dir "/Users/penny/Work/fun/theorem_proving/smtlink/z3_interface"
                         :SMT-files-dir "z3\_files"
                         :SMT-module    "RewriteExpt"
                         :SMT-class     "to_smt_w_expt"
