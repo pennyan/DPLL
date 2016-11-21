@@ -21,6 +21,8 @@
 (defttag :tshell)
 (value-triple (tshell-ensure))
 
+(set-evisc-tuple (evisc-tuple 100 200 nil nil) :iprint :same :sites :all)
+
 (local
  (defun my-smtlink-expt-config ()
    (declare (xargs :guard t))
@@ -392,7 +394,7 @@
      (B-sum (- nco 2) v0 dv g1 Kt)))
 
 (encapsulate ()
-  (local (defthm lemma-1
+  (local (defthmd lemma-1
            (implies (and (dpll-hyps :Kt :pos h) (<= 2 h))
                     (<= (expt (gamma Kt) h) (expt (gamma Kt) 2)))))
 
@@ -410,9 +412,17 @@
                          (implies (<= 2 h) (<= (expt (gamma Kt) h) (expt (gamma Kt) 2))))
                     (< (+ (B-term h v0 dv g1 Kt) (B-term (- h) v0 dv g1 Kt)) 0))
            :hints (
-                   ("Goal'"
-                    :in-theory (enable B-term)
-                    :clause-processor (SMT::smtlink clause)))))
+                   ("Goal"
+                    :clause-processor (SMT::smtlink clause)
+                    )
+                   ("Subgoal 1.6'"
+                    :in-theory (enable B-term))
+                   ("Subgoal 1.5"
+                    :in-theory (enable B-term))
+                   ("Subgoal 1.2"
+                    :in-theory (enable B-term))
+                   ("Subgoal 1.1"
+                    :in-theory (enable B-term)))))
 
   (local (acl2::enable-theory (theory 'arithmetic-book-only)))
 
