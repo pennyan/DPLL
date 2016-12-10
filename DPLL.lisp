@@ -504,7 +504,7 @@
    *default-smtlink-hint*
    :hypotheses (list (make-hint-pair :thm '(< (B nnco v0 dv g1 Kt) '0) :hints nil)
                      (make-hint-pair
-                      :thm '(equal (+ (A nnco phi0 v0 dv g1 Kt) (B nnco v0 dv g1 Kt))
+                      :thm '(equal (binary-+ (A nnco phi0 v0 dv g1 Kt) (B nnco v0 dv g1 Kt))
                                    (phi-2n-1 nnco phi0 v0 dv g1 Kt))
                       :hints nil)
                      (make-hint-pair :thm '(< (phi-2n-1 nnco phi0 v0 dv g1 Kt) '0) :hints nil))
@@ -579,7 +579,6 @@
   (defattach smt-hint my-smtlink-hint-2)
   (add-default-hints '((SMT::SMT-hint-wrapper-hint clause)))
 
-
   (defthm except-for-delta-<-0
     (implies (and (dpll-hyps :g1 :Kt :v0 :dv :int nnco :rat phi0)
                   (<= 3 nnco) (nc-ok (- nnco))
@@ -588,7 +587,9 @@
                    (* (gamma Kt) (B nnco v0 dv g1 Kt)))
                 0))
     :hints (("Goal"
-             :clause-processor (SMT::smtlink clause)))
+             :clause-processor (SMT::smtlink clause))
+            ("Subgoal 2'"
+             :in-theory (enable A B phi-2n-1)))
     ;; :hints (
     ;;         ("Goal'" :clause-processor
     ;;          (smtlink-dpll "except-for-delta-<-0"
@@ -640,6 +641,9 @@
 ;;   faster without the help from the arithmetic books.
 (acl2::disable-theory (theory 'arithmetic-book-only))
 
+(defattach smt-hint my-smtlink-hint)
+(add-default-hints '((SMT::SMT-hint-wrapper-hint clause)))
+
 (local (defthm delta-a-bound
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :int nnco)
                        (<= 3 nnco) (< nnco (1- (/ (mu) (* 2 *beta* g1)))))
@@ -650,6 +654,7 @@
                  :clause-processor
                  (SMT::smtlink clause)))))
 
+(stop)
 
 ;; this takes z3 6 minutes on my laptop -- I might break it into a few simpler lemmas.
 (local (defthm delta-b-bound
@@ -657,10 +662,13 @@
                        (< nnco-3 (- (/ (mu) (* 2 *beta* g1)) 4)))
                   (< (delta-b nnco-3 v0 dv g1 Kt)
                      (* (expt (gamma Kt) (- -3 nnco-3)) *beta*
-                        g1 (/ (mu)) (/ (+ 2 (* *alpha* v0))) -13/16)))
+                        g1 (/ (mu)) (/ (+ 2 (* *alpha* v0))) -13/16
+                        )))
          :hints(("Goal'" :in-theory (enable delta-b-half delta-b)
                  :clause-processor
                  (SMT::smtlink clause)))))
+
+
 
 (local (defthm lemma-1x  ; the key inequality for showing (< (delta ...)  0)
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :nat nnco-3)
