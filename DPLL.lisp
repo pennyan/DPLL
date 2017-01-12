@@ -40,7 +40,7 @@
          (len (remove-duplicates-eq
                (strip-cadrs (universal-theory :here)))))))
 
-(defun my-smtlink-hint ()
+(defun my-smtlink-hint-1 ()
   (declare (xargs :guard t :guard-debug t))
   (change-smtlink-hint
    *default-smtlink-hint*
@@ -60,7 +60,7 @@
    :smt-cnf (my-smtlink-expt-config)
    :wrld-fn-len *wrld-fn-len*))
 
-(defattach smt-hint my-smtlink-hint)
+(defattach smt-hint my-smtlink-hint-1)
 
 (add-default-hints '((SMT::SMT-hint-wrapper-hint clause)))
 
@@ -503,11 +503,12 @@
   (change-smtlink-hint
    *default-smtlink-hint*
    :hypotheses (list (make-hint-pair :thm '(< (B nnco v0 dv g1 Kt) '0) :hints nil)
-                     (make-hint-pair
-                      :thm '(equal (binary-+ (A nnco phi0 v0 dv g1 Kt) (B nnco v0 dv g1 Kt))
-                                   (phi-2n-1 nnco phi0 v0 dv g1 Kt))
-                      :hints nil)
-                     (make-hint-pair :thm '(< (phi-2n-1 nnco phi0 v0 dv g1 Kt) '0) :hints nil))
+                     ;; (make-hint-pair
+                     ;;  :thm '(equal (binary-+ (A nnco phi0 v0 dv g1 Kt) (B nnco v0 dv g1 Kt))
+                     ;;               (phi-2n-1 nnco phi0 v0 dv g1 Kt))
+                     ;;  :hints nil)
+                     (make-hint-pair :thm '(< (phi-2n-1 nnco phi0 v0 dv g1 Kt) '0) :hints nil)
+                     )
    :functions (list (make-func :name 'expt
                                :formals (list (make-decl :name 'r
                                                          :type (make-hint-pair :thm 'rationalp :hints nil))
@@ -518,24 +519,24 @@
                                :body 'nil
                                :expansion-depth 0
                                :uninterpreted t)
-                    (make-func :name 'A
-                               :formals (list (make-decl :name 'nnco
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
-                                              (make-decl :name 'phi0
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
-                                              (make-decl :name 'v0
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
-                                              (make-decl :name 'dv
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
-                                              (make-decl :name 'g1
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
-                                              (make-decl :name 'kt
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
-                               :returns (list (make-decl :name 'aa
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
-                               :body 'nil
-                               :expansion-depth 0
-                               :uninterpreted t)
+                    ;; (make-func :name 'A
+                    ;;            :formals (list (make-decl :name 'nnco
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil))
+                    ;;                           (make-decl :name 'phi0
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil))
+                    ;;                           (make-decl :name 'v0
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil))
+                    ;;                           (make-decl :name 'dv
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil))
+                    ;;                           (make-decl :name 'g1
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil))
+                    ;;                           (make-decl :name 'kt
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil)))
+                    ;;            :returns (list (make-decl :name 'aa
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil)))
+                    ;;            :body 'nil
+                    ;;            :expansion-depth 0
+                    ;;            :uninterpreted t)
                     (make-func :name 'B
                                :formals (list (make-decl :name 'nnco
                                                          :type (make-hint-pair :thm 'rationalp :hints nil))
@@ -552,24 +553,25 @@
                                :body 'nil
                                :expansion-depth 0
                                :uninterpreted t)
-                    (make-func :name 'phi-2n-1
-                               :formals (list (make-decl :name 'nnco
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
-                                              (make-decl :name 'phi0
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
-                                              (make-decl :name 'v0
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
-                                              (make-decl :name 'dv
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
-                                              (make-decl :name 'g1
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
-                                              (make-decl :name 'kt
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
-                               :returns (list (make-decl :name 'ph
-                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
-                               :body 'nil
-                               :expansion-depth 0
-                               :uninterpreted t))
+                    ;; (make-func :name 'phi-2n-1
+                    ;;            :formals (list (make-decl :name 'nnco
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil))
+                    ;;                           (make-decl :name 'phi0
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil))
+                    ;;                           (make-decl :name 'v0
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil))
+                    ;;                           (make-decl :name 'dv
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil))
+                    ;;                           (make-decl :name 'g1
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil))
+                    ;;                           (make-decl :name 'kt
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil)))
+                    ;;            :returns (list (make-decl :name 'ph
+                    ;;                                      :type (make-hint-pair :thm 'rationalp :hints nil)))
+                    ;;            :body 'nil
+                    ;;            :expansion-depth 0
+                    ;;            :uninterpreted t)
+                    )
    :int-to-rat t
    :rm-file nil
    :smt-hint nil
@@ -654,31 +656,35 @@
                  :clause-processor
                  (SMT::smtlink clause)))))
 
-(stop)
-
-;; this takes z3 6 minutes on my laptop -- I might break it into a few simpler lemmas.
+;; This takes z3 6 minutes on my laptop -- I might break it into a few simpler
+;; lemmas.
+;; New: This proof takes about 1 min in z3 now. Mark believes -9/8 can be strengthened
+;; to -6/5 or even -97/80, but z3 took about 4.5 mins to prove the -6/5 result. We don't
+;; need a slower proof.
 (local (defthm delta-b-bound
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :nat nnco-3)
                        (< nnco-3 (- (/ (mu) (* 2 *beta* g1)) 4)))
                   (< (delta-b nnco-3 v0 dv g1 Kt)
                      (* (expt (gamma Kt) (- -3 nnco-3)) *beta*
-                        g1 (/ (mu)) (/ (+ 2 (* *alpha* v0))) -13/16
+                        g1 (/ (mu)) (/ (+ 1 (* *alpha* v0))) -9/8
                         )))
          :hints(("Goal'" :in-theory (enable delta-b-half delta-b)
                  :clause-processor
                  (SMT::smtlink clause)))))
 
 
+;; (stop)
+
 
 (local (defthm lemma-1x  ; the key inequality for showing (< (delta ...)  0)
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :nat nnco-3)
                        (< nnco-3 (- (/ (mu) (* 2 *beta* g1)) 4)))
                   (< (+ (* (expt (gamma Kt) (+ nnco-3 2)) (* 4 *beta* g1 (/ (1+ (* 2 *alpha* v0)))) (+ 1 (gamma Kt)))
-                        (* (expt (gamma Kt) (- -3 nnco-3)) *beta* g1 (/ (mu)) (/ (+ 2 (* *alpha* v0))) -13/16)) 0))
+                        (* (expt (gamma Kt) (- -3 nnco-3)) *beta* g1 (/ (mu)) (/ (+ 1 (* *alpha* v0))) -9/8)) 0))
          :hints(("Goal''" :clause-processor
                  (SMT::smtlink clause)))))
 
-(enable-theory (theory 'arithmetic-book-only))
+(acl2::enable-theory (theory 'arithmetic-book-only))
 
 ;  (local (defthm lemma-rationalp-of-a-bound ; needed for the main proof
 ;    (implies (and (dpll-hyps :g1 :Kt :v0 :int nnco)
@@ -706,35 +712,135 @@
 ;      :in-theory (disable rationalp-of-delta-b)
 ;      :use((:instance rationalp-of-delta-b (nnco-3 (- nnco 3)) (v0 v0) (dv dv) (g1 g1) (Kt Kt)))))))
 
-(local (defthm b-bound-corollary  ; instantiate delta-b-bound with (nnco-3 (- nnco 3))
+(local (defthmd b-bound-corollary  ; instantiate delta-b-bound with (nnco-3 (- nnco 3))
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :int nnco)
                        (<= 3 nnco) (< nnco (- (/ (mu) (* 2 *beta* g1)) 1)))
                   (< (delta-b (- nnco 3) v0 dv g1 Kt)
-                     (* (expt (gamma Kt) (- nnco)) *beta* g1 (/ (mu)) (/ (+ 2 (* *alpha* v0))) -13/16)))
+                     (* (expt (gamma Kt) (- nnco)) *beta* g1 (/ (mu)) (/ (+ 1 (* *alpha* v0))) -9/8)))
          :hints(("Goal" :in-theory (disable delta-b-bound)
                  :use((:instance delta-b-bound (nnco-3 (- nnco 3)) (v0 v0) (dv dv) (g1 g1) (Kt Kt)))))))
 
-(local (defthm lemma-1-corollary ; instantiate lemma-1 with (nnco-3 (- nnco 3))
+(local (defthmd lemma-1-corollary ; instantiate lemma-1 with (nnco-3 (- nnco 3))
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :int nnco)
                        (<= 3 nnco) (< nnco (- (/ (mu) (* 2 *beta* g1)) 1)))
                   (< (+ (* (expt (gamma Kt) (- nnco 1)) (* 4 *beta* g1 (/ (1+ (* 2 *alpha* v0)))) (+ 1 (gamma Kt)))
-                        (* (expt (gamma Kt) (- nnco)) *beta* g1 (/ (mu)) (/ (+ 2 (* *alpha* v0))) -13/16)) 0))
+                        (* (expt (gamma Kt) (- nnco)) *beta* g1 (/ (mu)) (/ (+ 1 (* *alpha* v0))) -9/8)) 0))
          :hints(("Goal" :in-theory (disable lemma-1x)
                  :use((:instance lemma-1x (nnco-3 (- nnco 3)) (v0 v0) (g1 g1) (Kt Kt)))))))
 
+(local (defthmd lemma-2-1
+         (implies (and (rationalp a0) (rationalp a1) (rationalp b0) (rationalp b1)
+                       (< a0 a1) (< b0 b1) (< (+ a1 b1) 0))
+                  (< (+ a0 b0) 0))))
+
+(acl2::disable-theory (theory 'arithmetic-book-only))
+
+  (defun my-smtlink-hint-3 ()
+  (declare (xargs :guard t :guard-debug t))
+  (change-smtlink-hint
+   *default-smtlink-hint* ;; ((< a0 a1) (< b0 b1) (< (+ a1 b1) 0))
+   :hypotheses (list (make-hint-pair :thm '(< (delta-a nnco v0 dv g1 Kt) a1) :hints delta-a-bound)
+                     (make-hint-pair
+                      :thm '(equal (binary-+ (A nnco phi0 v0 dv g1 Kt) (B nnco v0 dv g1 Kt))
+                                   (phi-2n-1 nnco phi0 v0 dv g1 Kt))
+                      :hints nil)
+                     (make-hint-pair :thm '(< (phi-2n-1 nnco phi0 v0 dv g1 Kt) '0) :hints nil))
+   :functions (list (make-func :name 'expt
+                               :formals (list (make-decl :name 'r
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'i
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
+                               :returns (list (make-decl :name 'ex
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
+                               :body 'nil
+                               :expansion-depth 0
+                               :uninterpreted t)
+                    (make-func :name 'A
+                               :formals (list (make-decl :name 'nnco
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'phi0
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'v0
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'dv
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'g1
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'kt
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
+                               :returns (list (make-decl :name 'aa
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
+                               :body 'nil
+                               :expansion-depth 0
+                               :uninterpreted t)
+                    (make-func :name 'B
+                               :formals (list (make-decl :name 'nnco
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'v0
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'dv
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'g1
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'kt
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
+                               :returns (list (make-decl :name 'bb
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
+                               :body 'nil
+                               :expansion-depth 0
+                               :uninterpreted t)
+                    (make-func :name 'phi-2n-1
+                               :formals (list (make-decl :name 'nnco
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'phi0
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'v0
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'dv
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'g1
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil))
+                                              (make-decl :name 'kt
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
+                               :returns (list (make-decl :name 'ph
+                                                         :type (make-hint-pair :thm 'rationalp :hints nil)))
+                               :body 'nil
+                               :expansion-depth 0
+                               :uninterpreted t))
+   :int-to-rat t
+   :rm-file nil
+   :smt-hint nil
+   :smt-cnf (my-smtlink-expt-config)
+   :wrld-fn-len *wrld-fn-len*))
+
+(defattach smt-hint my-smtlink-hint-3)
+(add-default-hints '((SMT::SMT-hint-wrapper-hint clause)))
 
 (local (defthm lemma-2
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :int nnco)
                        (<= 3 nnco) (nc-ok (- -1 nnco)))
                   (< (+ (delta-a nnco v0 dv g1 Kt) (delta-b (- nnco 3) v0 dv g1 Kt)) 0))
+         :hints (("Goal"
+                  :in-theory (disable lemma-2-1 delta-a-bound b-bound-corollary lemma-1-corollary)
+                  :use ((:instance lemma-2-1
+                                          (a0 (delta-a nnco v0 dv g1 Kt))
+                                          (a1 (* (expt (gamma Kt) (- nnco 1)) (* 4 *beta* g1 (/ (1+ (* 2 *alpha* v0))))
+                                                 (+ 1 (gamma Kt))))
+                                          (b0 (delta-b (- nnco 3) v0 dv g1 Kt))
+                                          (b1 (* (expt (gamma Kt) (- nnco)) *beta* g1 (/ (mu)) (/ (+ 1 (* *alpha* v0))) -9/8)))
+                               (:instance delta-a-bound (nnco nnco) (g1 g1) (v0 v0) (dv dv) (kt kt))
+                               (:instance b-bound-corollary (nnco nnco) (g1 g1) (v0 v0) (dv dv) (kt kt))
+                               (:instance lemma-1-corollary (nnco nnco) (g1 g1) (v0 v0) (dv dv) (kt kt))
+                               (:instance rationalp-of-delta-b (nnco-3 (- nnco 3))))))))
          :hints(
+                ("Goal'" :clause-processor )
                 ("Goal'" :clause-processor (smtlink-dpll "delta-<-0--lemma-2"
                                                          (  (:let ( (a0 (delta-a nnco v0 dv g1 Kt) rationalp)
                                                                     (a1 (* (expt (gamma Kt) (- nnco 1)) (* 4 *beta* g1 (/ (1+ (* 2 *alpha* v0))))
                                                                            (+ 1 (gamma Kt))) rationalp)
                                                                     (b0 (delta-b (- nnco 3) v0 dv g1 Kt) rationalp)
-                                                                    (b1 (* (expt (gamma Kt) (- nnco)) *beta* g1 (/ (mu)) (/ (+ 2 (* *alpha* v0)))
-                                                                           -13/16) rationalp)))
+                                                                    (b1 (* (expt (gamma Kt) (- nnco)) *beta* g1 (/ (mu)) (/ (+ 1 (* *alpha* v0)))
+                                                                           -9/8) rationalp)))
                                                             (:hypothesize ((< a0 a1) (< b0 b1) (< (+ a1 b1) 0)))
                                                             (:use (;; (:let  ( (lemma-rationalp-of-delta-a)
                                                                    ;;	         (lemma-rationalp-of-a-bound)
