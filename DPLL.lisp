@@ -534,13 +534,12 @@
                                                              (kt rationalp))
                                                    :returns ((gh rationalp))
                                                    :level 0))
-                                        :hypotheses (((< (B nnco v0 dv g1 Kt) '0))
-                                                     ((equal (binary-+ (A nnco phi0 v0 dv g1 Kt) (B nnco v0 dv g1 Kt))
-                                                             (phi-2n-1 nnco
-                                                                       phi0 v0 dv g1 Kt))
+                                        :hypotheses (((< (B nnco v0 dv g1 Kt) 0))
+                                                     ((equal (+ (A nnco phi0 v0 dv g1 Kt) (B nnco v0 dv g1 Kt))
+                                                             (phi-2n-1 nnco phi0 v0 dv g1 Kt))
                                                       :hints (:in-theory
                                                               (enable phi-2n-1)))
-                                                     ((< (phi-2n-1 nnco phi0 v0 dv g1 Kt) '0)))
+                                                     ((< (phi-2n-1 nnco phi0 v0 dv g1 Kt) 0)))
                                         :main-hint nil
                                         :smt-fname ""
                                         :int-to-rat t
@@ -736,18 +735,19 @@
                                                        (disable delta-a-bound)
                                                        :use
                                                        ((:instance delta-a-bound))))
-                                              ((< (delta-b (binary-+ '-3 nnco)
+                                              ((< (delta-b (- nnco 3)
                                                            v0 dv g1 kt)
                                                   (delta-b-bound-fn
-                                                 g1 kt v0 (binary-+ '-3 nnco)))
+                                                   g1 kt v0 (- nnco 3)))
                                                :hints (:in-theory
                                                        (disable b-bound-corollary)
                                                        :use
                                                        ((:instance
                                                          b-bound-corollary))))
-                                              ((< (binary-+ (delta-a-bound-fn g1 kt v0 nnco)
-                                                            (delta-b-bound-fn g1 kt v0 (binary-+ '-3 nnco)))
-                                                  '0)
+                                              ((< (+ (delta-a-bound-fn g1 kt v0 nnco)
+                                                     (delta-b-bound-fn g1 kt v0
+                                                                       (- nnco 3)))
+                                                  0)
                                                :hints (:in-theory
                                                        (disable lemma-1-corollary)
                                                        :use
