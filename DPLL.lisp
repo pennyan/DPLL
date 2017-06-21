@@ -33,12 +33,6 @@
                        :SMT-cmd       "python"
                        :file-format   ".py"))
 
-(make-event
- (list 'defconst '*wrld-fn-len*
-       (b* ((world (w state)))
-         (len (remove-duplicates-eq
-               (strip-cadrs (universal-theory :here)))))))
-
 (defun my-smtlink-hint-1 ()
   (declare (xargs :guard t :guard-debug t))
   (change-smtlink-hint
@@ -54,9 +48,7 @@
                                :expansion-depth 0))
    :int-to-rat t
    :rm-file nil
-   :smt-params nil
-   :smt-cnf (my-smtlink-expt-config)
-   :wrld-fn-len *wrld-fn-len*))
+   :smt-cnf (my-smtlink-expt-config)))
 
 
 (defattach smt-hint my-smtlink-hint-1)
@@ -507,45 +499,45 @@
     :hints (("Goal"
              :clause-processor
              (SMT::smtlink clause
-                           '(:functions ((expt :formals ((r rationalp)
-                                                         (i rationalp))
-                                               :returns ((ex rationalp))
-                                               :level 0)
-                                         (A :formals ((nnco rationalp)
-                                                      (phi0 rationalp)
-                                                      (v0 rationalp)
-                                                      (dv rationalp)
-                                                      (g1 rationalp)
-                                                      (kt rationalp))
-                                            :returns ((aa rationalp))
-                                            :level 0)
-                                         (B :formals ((nnco rationalp)
-                                                      (v0 rationalp)
-                                                      (dv rationalp)
-                                                      (g1 rationalp)
-                                                      (kt rationalp))
-                                            :returns ((bb rationalp))
-                                            :level 0)
-                                         (phi-2n-1 :formals ((nnco rationalp)
-                                                             (phi0 rationalp)
-                                                             (v0 rationalp)
-                                                             (dv rationalp)
-                                                             (g1 rationalp)
-                                                             (kt rationalp))
-                                                   :returns ((gh rationalp))
-                                                   :level 0))
-                                        :hypotheses (((< (B nnco v0 dv g1 Kt) 0))
-                                                     ((equal (+ (A nnco phi0 v0 dv g1 Kt) (B nnco v0 dv g1 Kt))
-                                                             (phi-2n-1 nnco phi0 v0 dv g1 Kt))
-                                                      :hints (:in-theory
-                                                              (enable phi-2n-1)))
-                                                     ((< (phi-2n-1 nnco phi0 v0 dv g1 Kt) 0)))
-                                        :main-hint nil
-                                        :smt-fname ""
-                                        :int-to-rat t
-                                        :rm-file nil
-                                        :smt-solver-params nil
-                                        :smt-solver-cnf nil)))
+                           (:functions ((expt :formals ((r rationalp)
+                                                        (i rationalp))
+                                              :returns ((ex rationalp))
+                                              :level 0)
+                                        (A :formals ((nnco rationalp)
+                                                     (phi0 rationalp)
+                                                     (v0 rationalp)
+                                                     (dv rationalp)
+                                                     (g1 rationalp)
+                                                     (kt rationalp))
+                                           :returns ((aa rationalp))
+                                           :level 0)
+                                        (B :formals ((nnco rationalp)
+                                                     (v0 rationalp)
+                                                     (dv rationalp)
+                                                     (g1 rationalp)
+                                                     (kt rationalp))
+                                           :returns ((bb rationalp))
+                                           :level 0)
+                                        (phi-2n-1 :formals ((nnco rationalp)
+                                                            (phi0 rationalp)
+                                                            (v0 rationalp)
+                                                            (dv rationalp)
+                                                            (g1 rationalp)
+                                                            (kt rationalp))
+                                                  :returns ((gh rationalp))
+                                                  :level 0))
+                            :hypotheses (((< (B nnco v0 dv g1 Kt) 0))
+                                         ((equal (+ (A nnco phi0 v0 dv g1 Kt) (B nnco v0 dv g1 Kt))
+                                                 (phi-2n-1 nnco phi0 v0 dv g1 Kt))
+                                          :hints (:in-theory
+                                                  (enable phi-2n-1)))
+                                         ((< (phi-2n-1 nnco phi0 v0 dv g1 Kt) 0)))
+                            :main-hint nil
+                            :smt-fname ""
+                            :int-to-rat t
+                            :rm-file nil
+                            :smt-solver-params nil
+                            :smt-solver-cnf nil)))
             )))
 
 (define delta-a-half (nnco v0 dv g1 Kt)
@@ -628,8 +620,7 @@
                        (< nnco-3 (+ (/ (mu) (* 2 *beta* g1)) -4)))
                   (< (delta-b nnco-3 v0 dv g1 Kt)
                      (delta-b-bound-fn g1 Kt v0 nnco-3)))
-         :hints(("Goal'"
-                 :in-theory (enable delta-b delta-b-bound-fn)
+         :hints(("Goal"
                  :clause-processor
                  (SMT::smtlink clause nil)))))
 
@@ -637,15 +628,15 @@
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :nat nnco-3)
                        (< nnco-3 (- (/ (mu) (* 2 *beta* g1)) 4)))
                   (< (+ (delta-a-bound-fn g1 kt v0 (+ nnco-3 3))
-                        (delta-b-bound-fn g1 Kt v0 nnco-3)) 0))
+                        (delta-b-bound-fn g1 Kt v0 nnco-3))
+                     0))
          :hints(("Goal"
-                 :in-theory (enable delta-a-bound-fn delta-b-bound-fn)
                  :clause-processor
                  (SMT::smtlink clause nil)))))
 
 (local (acl2::disable-theory (theory 'arithmetic-book-only)))
 
-(local (defthm b-bound-corollary-lemma  ; instantiate delta-b-bound with (nnco-3 (- nnco 3))
+(local (defthm b-bound-corollary-lemma
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :nat nnco-3)
                        (nc-ok (- -4 nnco-3)))
                   (< (delta-b nnco-3 v0 dv g1 Kt)
@@ -657,11 +648,12 @@
                       (:instance nc-ok-lemma (k -4) (nnco nnco-3))
                       )))))
 
-(local (defthm lemma-1-corollary-lemma ; instantiate lemma-1x with (nnco-3 (- nnco 3))
+(local (defthm lemma-1-corollary-lemma
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :nat nnco-3)
                        (nc-ok (- -4 nnco-3)))
                   (< (+ (delta-a-bound-fn g1 kt v0 (+ nnco-3 3))
-                        (delta-b-bound-fn g1 Kt v0 nnco-3)) 0))
+                        (delta-b-bound-fn g1 Kt v0 nnco-3))
+                     0))
          :hints(("Goal"
                  :in-theory (disable lemma-1x)
                  :use((:instance lemma-1x (nnco-3 nnco-3) (v0 v0) (g1 g1)
@@ -670,24 +662,25 @@
 
 (local (acl2::enable-theory (theory 'arithmetic-book-only)))
 
-(local (defthm b-bound-corollary  ; instantiate delta-b-bound with (nnco-3 (- nnco 3))
+(local (defthmd b-bound-corollary  ; instantiate delta-b-bound with (nnco-3 (- nnco 3))
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :int nnco)
                        (<= 3 nnco) (nc-ok (- -1 nnco)))
                   (< (delta-b (- nnco 3) v0 dv g1 Kt)
                      (delta-b-bound-fn g1 Kt v0 (- nnco 3))))
          :hints(("Goal"
-                 :in-theory (disable delta-b-bound)
+                 :in-theory (disable b-bound-corollary-lemma)
                  :use((:instance b-bound-corollary-lemma (nnco-3 (- nnco 3)) (v0 v0)
                                  (dv dv) (g1 g1) (Kt Kt))
                       )))))
 
-(local (defthm lemma-1-corollary ; instantiate lemma-1x with (nnco-3 (- nnco 3))
+(local (defthmd lemma-1-corollary ; instantiate lemma-1x with (nnco-3 (- nnco 3))
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :int nnco)
                        (<= 3 nnco) (nc-ok (- -1 nnco)))
                   (< (+ (delta-a-bound-fn g1 kt v0 nnco)
-                        (delta-b-bound-fn g1 Kt v0 (- nnco 3))) 0))
+                        (delta-b-bound-fn g1 Kt v0 (- nnco 3)))
+                     0))
          :hints(("Goal"
-                 :in-theory (disable lemma-1x)
+                 :in-theory (disable lemma-1-corollary-lemma)
                  :use((:instance lemma-1-corollary-lemma (nnco-3 (- nnco 3))
                                  (v0 v0) (dv dv) (g1 g1) (Kt Kt)))))))
 
@@ -699,65 +692,60 @@
                 ("Goal"
                  :clause-processor
                  (SMT::smtlink clause
-                               '(:functions ((delta-a :formals ((nnco rationalp)
-                                                                (v0 rationalp)
-                                                                (dv rationalp)
-                                                                (g1 rationalp)
-                                                                (Kt rationalp))
-                                                      :returns ((da rationalp))
-                                                      :level 0)
-                                             (delta-a-bound-fn :formals ((g1 rationalp)
-                                                                         (Kt rationalp)
-                                                                         (v0 rationalp)
-                                                                         (nnco rationalp))
-                                                               :returns ((dafn
-                                                                          rationalp))
-                                                               :level 0)
-                                             (delta-b :formals ((nnco-3 rationalp)
-                                                                (v0 rationalp)
-                                                                (dv rationalp)
-                                                                (g1 rationalp)
-                                                                (Kt rationalp))
-                                                      :returns ((db rationalp
-                                                                    :hints
-                                                                    (:in-theory (enable delta-b))))
-                                                      :level 0)
-                                             (delta-b-bound-fn :formals ((g1 rationalp)
-                                                                         (Kt rationalp)
-                                                                         (v0 rationalp)
-                                                                         (nnco-3 rationalp))
-                                                               :returns ((dbfn rationalp))
-                                                               :level 0))
-                                 :hypotheses (((< (delta-a nnco v0 dv g1 Kt)
-                                                  (delta-a-bound-fn
-                                                   g1 Kt v0 nnco))
-                                               :hints (:in-theory
-                                                       (disable delta-a-bound)
-                                                       :use
-                                                       ((:instance delta-a-bound))))
-                                              ((< (delta-b (- nnco 3)
-                                                           v0 dv g1 kt)
-                                                  (delta-b-bound-fn
-                                                   g1 kt v0 (- nnco 3)))
-                                               :hints (:in-theory
-                                                       (disable b-bound-corollary)
-                                                       :use
-                                                       ((:instance
-                                                         b-bound-corollary))))
-                                              ((< (+ (delta-a-bound-fn g1 kt v0 nnco)
-                                                     (delta-b-bound-fn g1 kt v0
-                                                                       (- nnco 3)))
+                               (:functions ((delta-a :formals ((nnco rationalp)
+                                                               (v0 rationalp)
+                                                               (dv rationalp)
+                                                               (g1 rationalp)
+                                                               (Kt rationalp))
+                                                     :returns ((da rationalp))
+                                                     :level 0)
+                                            (delta-a-bound-fn :formals ((g1 rationalp)
+                                                                        (Kt rationalp)
+                                                                        (v0 rationalp)
+                                                                        (nnco rationalp))
+                                                              :returns ((dafn
+                                                                         rationalp))
+                                                              :level 0)
+                                            (delta-b :formals ((nnco-3 rationalp)
+                                                               (v0 rationalp)
+                                                               (dv rationalp)
+                                                               (g1 rationalp)
+                                                               (Kt rationalp))
+                                                     :returns ((db rationalp
+                                                                   :hints
+                                                                   (:in-theory (enable delta-b))))
+                                                     :level 0)
+                                            (delta-b-bound-fn :formals ((g1 rationalp)
+                                                                        (Kt rationalp)
+                                                                        (v0 rationalp)
+                                                                        (nnco-3 rationalp))
+                                                              :returns ((dbfn rationalp))
+                                                              :level 0))
+                                :hypotheses (((< (delta-a nnco v0 dv g1 Kt)
+                                                 (delta-a-bound-fn
+                                                  g1 Kt v0 nnco))
+                                              :hints (:use
+                                                      ((:instance delta-a-bound))))
+                                             ((< (delta-b (- nnco 3)
+                                                          v0 dv g1 kt)
+                                                 (delta-b-bound-fn
+                                                  g1 kt v0 (- nnco 3)))
+                                              :hints (:use
+                                                      ((:instance
+                                                        b-bound-corollary))))
+                                             ((< (+ (delta-a-bound-fn g1 kt v0 nnco)
+                                                    (delta-b-bound-fn g1 kt v0
+                                                                      (- nnco 3)))
                                                   0)
-                                               :hints (:in-theory
-                                                       (disable lemma-1-corollary)
-                                                       :use
-                                                       ((:instance lemma-1-corollary)))))
-                                 :main-hint nil
-                                 :smt-fname "delta-<-0--lemma-2"
-                                 :int-to-rat t
-                                 :rm-file nil
-                                 :smt-solver-params nil
-                                 :smt-solver-cnf nil)))
+                                              :hints (:use
+                                                      ((:instance
+                                                        lemma-1-corollary)))))
+                                :main-hint nil
+                                :smt-fname "delta-<-0--lemma-2"
+                                :int-to-rat t
+                                :rm-file nil
+                                :smt-solver-params nil
+                                :smt-solver-cnf nil)))
                 )))
 
 (defthm delta-<-0
