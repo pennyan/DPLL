@@ -24,12 +24,13 @@
 
 (defun my-smtlink-expt-config ()
   (declare (xargs :guard t))
-  (make-smtlink-config :interface-dir "/Users/penny/Work/fun/theorem_proving/smtlink/z3_interface"
-                       :SMT-files-dir "z3\_files"
-                       :SMT-module    "RewriteExpt"
-                       :SMT-class     "to_smt_w_expt"
-                       :SMT-cmd       "python"
-                       :file-format   ".py"))
+  (change-smtlink-config *default-smtlink-config*
+                         :interface-dir "/Users/penny/Work/fun/theorem_proving/smtlink/z3_interface"
+                         :smt-module    "RewriteExpt"
+                         :smt-class     "to_smt_w_expt"
+                         :smt-cmd       "python"
+                         :pythonpath    ""))
+(defattach custom-smt-cnf my-smtlink-expt-config)
 
 (defun my-smtlink-hint-1 ()
   (declare (xargs :guard t :guard-debug t))
@@ -45,8 +46,7 @@
                                :body 'nil
                                :expansion-depth 0))
    :int-to-rat t
-   :rm-file nil
-   :smt-cnf (my-smtlink-expt-config)))
+   :rm-file nil))
 
 
 (defattach smt-hint my-smtlink-hint-1)
@@ -411,7 +411,7 @@
                     (< (+ (B-term h v0 dv g1 Kt) (B-term (- h) v0 dv g1 Kt)) 0))
            :hints (
                    ("Goal"
-                    :smtlink nil))))
+                    :smtlink-custom nil))))
 
   (local (acl2::enable-theory (theory 'arithmetic-book-only)))
 
@@ -495,7 +495,7 @@
                    (* (gamma Kt) (B nnco v0 dv g1 Kt)))
                 0))
     :hints (("Goal"
-             :smtlink
+             :smtlink-custom
              (:functions ((expt :formals ((r rationalp)
                                           (i rationalp))
                                 :returns ((ex rationalp))
@@ -529,12 +529,7 @@
                                        :hints (:in-theory
                                                (enable phi-2n-1)))
                                       ((< (phi-2n-1 nnco phi0 v0 dv g1 Kt) 0)))
-                         :main-hint nil
-                         :smt-fname ""
-                         :int-to-rat t
-                         :rm-file nil
-                         :smt-solver-params nil
-                         :smt-solver-cnf nil))
+                         :int-to-rat t))
             )))
 
 (define delta-a-half (nnco v0 dv g1 Kt)
@@ -592,7 +587,7 @@
                      (delta-a-bound-fn g1 Kt v0 nnco)))
          :hints(("Goal'"
                  :in-theory (enable delta-a-bound-fn)
-                 :smtlink nil))))
+                 :smtlink-custom nil))))
 
 (define delta-b-bound-fn (g1 Kt v0 nnco-3)
     :guard (and (dpll-hyps :g1 :Kt :v0 :nat nnco-3)
@@ -617,7 +612,7 @@
                   (< (delta-b nnco-3 v0 dv g1 Kt)
                      (delta-b-bound-fn g1 Kt v0 nnco-3)))
          :hints(("Goal"
-                 :smtlink nil))))
+                 :smtlink-custom nil))))
 
 (local (defthm lemma-1x  ; the key inequality for showing (< (delta ...)  0)
          (implies (and (dpll-hyps :g1 :Kt :v0 :dv :nat nnco-3)
@@ -626,7 +621,7 @@
                         (delta-b-bound-fn g1 Kt v0 nnco-3))
                      0))
          :hints(("Goal"
-                 :smtlink nil))))
+                 :smtlink-custom nil))))
 
 (local (acl2::disable-theory (theory 'arithmetic-book-only)))
 
@@ -733,12 +728,7 @@
                                            :hints (:use
                                                    ((:instance
                                                      lemma-1-corollary)))))
-                             :main-hint nil
-                             :smt-fname "delta-<-0--lemma-2"
-                             :int-to-rat t
-                             :rm-file nil
-                             :smt-solver-params nil
-                             :smt-solver-cnf nil)))
+                             :int-to-rat t)))
                 ))
 
 (defthm delta-<-0
