@@ -304,40 +304,6 @@
        ((if (eql (caar stuff) :uninterpreted)) (fix-rest (cdr stuff))))
     (cons (car stuff) (fix-rest (cdr stuff)))))
 
-(defun smtlink-dpll-fn (clause-name stuff)
-  (b* ((my-fns '( (A rationalp)
-                  (B-term rationalp)
-                  (B-term-expt rationalp)
-                  (B-term-rest rationalp)
-                  (dv0 rationalp)
-                  (delta rationalp)
-                  (delta-a-half rationalp)
-                  (delta-b-half rationalp)
-                  (equ-c rationalp)
-                  (equ-nc rationalp)
-                  (fdco rationalp)
-                  (gamma rationalp)
-                  (m rationalp)
-                  (mu rationalp)
-                  (phi-2n-1 rationalp)
-                  (plus rationalp)
-                  (delta-a rationalp)
-                  (delta-b rationalp)))
-       (my-level 1)
-       (my-uninterpreted '((expt rationalp rationalp rationalp)))
-       (fn-list (append my-fns (cadr (assoc :functions (cadr (assoc :expand stuff))))))
-       (new-fn-level (cadr (assoc :expansion-level (cadr (assoc :expand stuff)))))
-       (fn-level (if new-fn-level new-fn-level my-level))
-       (uninterpreted (append my-uninterpreted (cadr (assoc :uninterpreted-functions stuff))))
-       (arg1 `((:expand ((:functions ,fn-list) (:expansion-level ,fn-level)))
-               (:uninterpreted-functions ,uninterpreted)
-               (:python-file ,clause-name)))
-       (args (append arg1 (fix-rest stuff))))
-    (list 'smtlink-custom-config 'clause `(quote ,args))))
-
-(defmacro smtlink-dpll (clause-name &optional stuff)
-  (smtlink-dpll-fn clause-name stuff))
-
 (defconst *-/2beta* (/ (* -2 *beta*)))
 (defun nc-ok-help (g1 stuff)
   (b* (((unless (consp stuff)) nil)
@@ -391,38 +357,15 @@
   (* (expt (gamma Kt) (- nco 2))
      (B-sum (- nco 2) v0 dv g1 Kt)))
 
-(encapsulate ()
-  (local (defthmd lemma-1
-           (implies (and (dpll-hyps :Kt :pos h) (<= 2 h))
-                    (<= (expt (gamma Kt) h) (expt (gamma Kt) 2)))))
-
-  ;; ACL2 proves that the expanded SMT-link clause implies the original
-  ;; much faster when we disable the arithmetic books.
-  (local (acl2::disable-theory (theory 'arithmetic-book-only)))
-
-  ;; I'm going through some extra gymnastics to bring a bound on (expt (gamma Kt) h)
-  ;; to the attention of my code for handling expt in SMTlink.  I should generalize
-  ;; that code to eliminate the ened for the extra hypothesis here.  That should
-  ;; allow B-term-neg to be proven directly by the SMT solver without any extra
-  ;; lemmas.
-  (local (defthm lemma-2
-           (implies (and (dpll-hyps :g1 :Kt :v0 :dv :pos h) (nc-ok (- h))
-                         (implies (<= 2 h) (<= (expt (gamma Kt) h) (expt (gamma Kt) 2)))) ;; use the smtlink hypotheses?
-                    (< (+ (B-term h v0 dv g1 Kt) (B-term (- h) v0 dv g1 Kt)) 0))
-           :hints (
-                   ("Goal"
-                    :smtlink-custom nil))))
-
-  (local (acl2::enable-theory (theory 'arithmetic-book-only)))
-
-  (defthm B-term-neg
-    (implies (and (dpll-hyps :g1 :Kt :v0 :dv :pos h) (nc-ok h (- h)))
-             (< (+ (B-term h v0 dv g1 Kt) (B-term (- h) v0 dv g1 Kt)) 0))
-    :hints (("Goal''" :use(
-                           (:instance lemma-1 (Kt Kt)  (h h))
-                           (:instance lemma-2 (g1 g1) (Kt Kt) (v0 v0) (dv dv) (h h)))))
-    :rule-classes :linear))
-
+(defthm B-term-neg
+  (implies (and (dpll-hyps :g1 :Kt :v0 :dv :pos h) (nc-ok h (- h)))
+           (< (+ (B-term h v0 dv g1 Kt) (B-term (- h) v0 dv g1 Kt)) 0))
+  :hints (("Goal''"
+           :smtlink-custom
+           (:hypotheses (((implies (<= 2 h)
+                                   (<= (expt (gamma Kt) h)
+                                       (expt (gamma Kt) 2))))))))
+  :rule-classes :linear)
 
 ; B-sum-neg show that the sum of a bunch of B-term pairs is negative.
 ;   This is a trivial induction proof that the sum of a bunch of negative values is negative.
@@ -496,11 +439,7 @@
                 0))
     :hints (("Goal"
              :smtlink-custom
-             (:functions ((expt :formals ((r rationalp)
-                                          (i rationalp))
-                                :returns ((ex rationalp))
-                                :level 0)
-                          (A :formals ((nnco rationalp)
+             (:functions ((A :formals ((nnco rationalp)
                                        (phi0 rationalp)
                                        (v0 rationalp)
                                        (dv rationalp)
@@ -528,8 +467,7 @@
                                               (phi-2n-1 nnco phi0 v0 dv g1 Kt))
                                        :hints (:in-theory
                                                (enable phi-2n-1)))
-                                      ((< (phi-2n-1 nnco phi0 v0 dv g1 Kt) 0)))
-                         :int-to-rat t))
+                                      ((< (phi-2n-1 nnco phi0 v0 dv g1 Kt) 0)))))
             )))
 
 (define delta-a-half (nnco v0 dv g1 Kt)
@@ -727,8 +665,7 @@
                                               0)
                                            :hints (:use
                                                    ((:instance
-                                                     lemma-1-corollary)))))
-                             :int-to-rat t)))
+                                                     lemma-1-corollary))))))))
                 ))
 
 (defthm delta-<-0
